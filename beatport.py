@@ -2,10 +2,9 @@ from beets.plugins import BeetsPlugin
 from beets.autotag.hooks import AlbumInfo, TrackInfo, Distance
 from lxml import html
 import logging
+import urllib
 import requests
 import re
-
-# TODO: Option to delete the first parenthesis if there is two
 
 log = logging.getLogger('beets')
 
@@ -38,7 +37,7 @@ class BeatportPlugin(BeetsPlugin):
 		track_list = []
 
 		try:
-			response = requests.get('http://classic.beatport.com/search?&perPage=30&facets[]=fieldType:track&query=%s' % query)
+			response = requests.get('http://classic.beatport.com/search?&perPage=30&facets[]=fieldType:track&query=%s' % urllib.quote_plus(query))
 		except Exception as e:
 			raise BeatportError("Error connection to Beatport: {}".format(e.message))
 		if not response:
