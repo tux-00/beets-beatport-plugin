@@ -34,13 +34,13 @@ class BeatportPlugin(BeetsPlugin):
 			tmp.append(re.sub(' +', ' ', i.text_content()))
 		return [re.sub(r'[\t\n\r]', '', i) for i in tmp]
 		
-	def _search(self, title):
+	def _search(self, query):
 		track_list = []
 
 		try:
-			response = requests.get('http://classic.beatport.com/search?&perPage=30&facets[]=fieldType:track&query=%s' % title)
+			response = requests.get('http://classic.beatport.com/search?&perPage=30&facets[]=fieldType:track&query=%s' % query)
 		except Exception as e:
-			raise BeatportError("Error connection to Beatport API: {}".format(e.message))
+			raise BeatportError("Error connection to Beatport: {}".format(e.message))
 		if not response:
 			raise BeatportError("Error {0.status_code} for '{0.request.path_url}".format(response))
 
@@ -55,7 +55,7 @@ class BeatportPlugin(BeetsPlugin):
 		RLDATE = self._format(tree.xpath('/html/body/div[1]/div[5]/div/div[3]/table/tr[*]/td[8]'))
 
 		for i, value in enumerate(HREF):
-			track = TrackInfo(title=TITLE, artist=ARTIST, track_id=None)
+			track = TrackInfo(title=unicode(TITLE[i]), artist=unicode(ARTIST[i]), track_id=None)
 			track_list.append(track)
 		
 		return track_list
