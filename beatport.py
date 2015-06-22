@@ -19,11 +19,12 @@ class BeatportPlugin(BeetsPlugin):
 	def track_distance(self, item, track_info):
 		dist = Distance()
 		if track_info.data_source == 'Beatport':
-			dist.add('source', '0.5')
+			dist.add('source', 0.5)
 		return dist
 	
 	def item_candidates(self, item, artist, title):
 		query = artist + " " + title
+		self._log.debug(u'Processing {0.title} by {0.artist}', item)
 		return self._search(query)
 
 	def _format(self, data_list):
@@ -54,7 +55,12 @@ class BeatportPlugin(BeetsPlugin):
 		RLDATE = self._format(tree.xpath('/html/body/div[1]/div[5]/div/div[3]/table/tr[*]/td[8]'))
 
 		for i, value in enumerate(HREF):
-			track = TrackInfo(title=unicode(TITLE[i]), artist=unicode(ARTIST[i]), track_id=None)
+			self._log.debug(u'query: %s -> found: %s' % (query, ARTIST[i] + " " + TITLE[i]))
+			track = TrackInfo(title=unicode(TITLE[i]),
+								artist=unicode(ARTIST[i]),
+								data_source=unicode("Beatport"),
+								data_url=unicode(HREF[i]),
+								track_id=None)
 			track_list.append(track)
 		
 		return track_list
